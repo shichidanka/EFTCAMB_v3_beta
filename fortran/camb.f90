@@ -105,7 +105,10 @@
             (P%DoLensing .or. State%num_redshiftwindows > 0)) then
             P%WantTransfer  = .true.
         end if
+        ! EFTCAMB MOD START:
+        !call OutData%SetParams(P, call_again=call_again)
         call OutData%SetParams(P)
+        ! EFTCAMB MOD END.
         if (global_error_flag==0) call cmbmain
         if (global_error_flag/=0) then
             if (present(error)) error =global_error_flag
@@ -588,6 +591,9 @@
     use constants
     use Bispectrum
     use CAMBmain
+    ! EFTCAMB MOD START: output of background quantities
+    use EFTCAMB_background_output
+    ! EFTCAMB MOD END.
     class(TIniFile) :: Ini
     character(LEN=*), intent(in) :: InputFile
     character(LEN=*), intent(inout) :: ErrMsg
@@ -605,6 +611,9 @@
 #endif
     logical PK_WantTransfer
     Type(CAMBdata) :: ActiveState
+    ! EFTCAMB MOD START: output of background quantities
+    integer :: eft_error !< EFTCAMB error code
+    ! EFTCAMB MOD END.
 
     call SetActiveState(ActiveState)
     CAMB_RunFromIni = .false.
@@ -613,6 +622,38 @@
 
     outroot = Ini%Read_String('output_root')
     if (outroot /= '') outroot = trim(outroot) // '_'
+
+    !EFTCAMB MOD START: allocate EFTCAMB and model selection
+    if ( allocated(P%EFTCAMB) ) deallocate(P%EFTCAMB)
+    allocate( P%EFTCAMB )
+    if ( allocated(P%eft_par_cache) ) deallocate(P%eft_par_cache)
+    allocate( P%eft_par_cache )
+    ! initialize model selection from file:
+    call P%EFTCAMB%EFTCAMB_init_from_file( Ini )
+    ! initialize outroot for debug printing:
+    P%EFTCAMB%outroot = TRIM( outroot )
+    ! initialize model:
+    if ( P%EFTCAMB%EFTFlag /= 0 ) then
+      ! print the EFTCAMB header:
+      call P%EFTCAMB%EFTCAMB_print_header()
+      ! initialize the model from file:
+      call P%EFTCAMB%EFTCAMB_init_model_from_file( Ini, eft_error )
+      if ( eft_error>0 ) then
+        ErrMsg = 'Invalid parameter value'
+        return
+      end if
+      ! print feedback:
+      call P%EFTCAMB%EFTCAMB_print_model_feedback()
+    end if
+
+    ! check compatibility of parameters:
+
+    !21 cm sources are not checked for MG effects, have to stop
+    if ( P%EFTCAMB%EFTflag /= 0 .and. P%Do21cm ) then
+        write(*,*) 'EFTCAMB is not compatible with 21 cm sources so far'
+        error stop 'Invalid parameter'
+    end if
+    !EFTCAMB MOD END
 
     PK_WantTransfer = Ini%Read_Logical('get_transfer')
     if (PK_WantTransfer)  then
@@ -757,6 +798,10 @@
 #endif
     end if
 
+    ! EFTCAMB MOD START: output of background quantities iw
+    call output_background( outroot, State )
+    ! EFTCAMB MOD END.
+
     CAMB_RunFromIni = .true.
 
     end function CAMB_RunFromIni
@@ -816,6 +861,13 @@
     highL_unlensed_cl_template = Ini%Read_String_Default( &
         'highL_unlensed_cl_template', highL_unlensed_cl_template)
     call Ini%Read('number_of_threads', ThreadNum)
+
+    ! EFTCAMB MOD START: in debug mode only use one thread
+#ifdef DEBUG
+    ThreadNum = 1
+#endif
+    ! EFTCAMB MOD END.
+
     call Ini%Read('DebugParam', DebugParam)
     call Ini%Read('feedback_level', FeedbackLevel)
     if (Ini%HasKey('DebugMsgs')) call Ini%Read('DebugMsgs', DebugMsgs)

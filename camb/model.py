@@ -9,6 +9,9 @@ from . import constants
 from .initialpower import InitialPower, SplinedInitialPower
 from .nonlinear import NonLinearModel
 from .dark_energy import DarkEnergyModel, DarkEnergyEqnOfState
+# EFTCAMB MOD START: include EFTCAMB
+from .eftcamb import EFTCAMB,EFTCAMB_parameter_cache
+# EFTCAMB MOD END.
 from .recombination import RecombinationModel
 from .sources import SourceWindow
 from . import bbn
@@ -148,7 +151,6 @@ class CustomSources(CAMB_Structure):
                 ("c_source_func", c_void_p, "Don't directly change this"),
                 ("custom_source_ell_scales", AllocatableArrayInt, "scaling in L for outputs")]
 
-
 @fortran_class
 class CAMBparams(F2003Class):
     """
@@ -232,7 +234,9 @@ class CAMBparams(F2003Class):
         ("use_cl_spline_template", c_bool,
          "When interpolating use a fiducial spectrum shape to define ratio to spline"),
         ("SourceWindows", AllocatableObjectArray(SourceWindow)),
-        ("CustomSources", CustomSources)
+        ("CustomSources", CustomSources),
+        ("EFTCAMB",AllocatableObject(EFTCAMB)),
+        ("EFTCAMB_parameter_cache",AllocatableObject(EFTCAMB_parameter_cache))
     ]
 
     _fortran_class_module_ = 'model'
@@ -408,7 +412,8 @@ class CAMBparams(F2003Class):
                       mnu=0.06, nnu=constants.default_nnu, YHe: Optional[float] = None, meffsterile=0.0,
                       standard_neutrino_neff=constants.default_nnu, TCMB=constants.COBE_CMBTemp,
                       tau: Optional[float] = None, zrei: Optional[float] = None, deltazrei: Optional[float] = None,
-                      Alens=1.0, bbn_predictor: Union[None, str, bbn.BBNPredictor] = None, theta_H0_range=(10, 100)):
+                      Alens=1.0, bbn_predictor: Union[None, str, bbn.BBNPredictor] = None, theta_H0_range=(10, 100),
+                      EFTCAMB_params={}, eft_header=True):
         r"""
         Sets cosmological parameters in terms of physical densities and parameters (e.g. as used in Planck analyses).
         Default settings give a single distinct neutrino mass eigenstate, by default one neutrino with mnu = 0.06eV.
@@ -522,6 +527,12 @@ class CAMBparams(F2003Class):
         elif deltazrei:
             raise CAMBError('must set tau if setting deltazrei')
 
+        # EFTCAMB MOD START: initialize EFTCAMB
+        if self.EFTCAMB is None:
+            self.EFTCAMB = self.make_class_named(EFTCAMB)
+        self.EFTCAMB.initialize_parameters(self, EFTCAMB_params, eft_header)
+        # EFTCAMB MOD END
+
         return self
 
     @property
@@ -576,6 +587,9 @@ class CAMBparams(F2003Class):
             self.NonLinear = self.make_class_named(non_linear_model, NonLinearModel)
         if recombination_model:
             self.Recomb = self.make_class_named(recombination_model, RecombinationModel)
+        # EFTCAMB MOD START: initialize eftcamb class
+        self.EFTCAMB = self.make_class_named(EFTCAMB)
+        # EFTCAMB MOD END.
 
     def set_dark_energy(self, w=-1.0, cs2=1.0, wa=0, dark_energy_model='fluid'):
         r"""
