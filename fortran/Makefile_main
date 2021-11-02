@@ -8,10 +8,7 @@ RECOMBINATION_FILES ?= recfast
 NONLINEAR_FILES     ?= halofit SecondOrderPK
 DARKENERGY_FILES  ?= DarkEnergyFluid DarkEnergyPPF PowellMinimize DarkEnergyQuintessence
 
-# EFTCAMB MOD START: use equations EFT
-EQUATIONS     ?= equations_eft
-# EQUATIONS     ?= equations
-# EFTCAMB MOD END.
+EQUATIONS     ?= equations
 
 BISPECTRUM ?= SeparableBispectrum
 

@@ -783,7 +783,7 @@ contains
             real(dl), intent(in) :: y_ini        !< initial condition (in this case the initial condition is a scalar)
             real(dl)             :: dummy_solve  !< the value of y(0)=H0^2
 
-            real(dl) :: y_temp
+            real(dl) :: y_temp(num_eq)
 
             ! reset the solver (warning, this is working in shared memory with the main subroutine, the other solver options are there)
             istate = 1
@@ -808,7 +808,7 @@ contains
                     end if
                 end if
             end do
-            dummy_solve = y_temp
+            dummy_solve = y_temp(1)
 
         end function dummy_solve
 

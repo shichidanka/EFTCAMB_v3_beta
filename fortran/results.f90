@@ -562,6 +562,7 @@
         end if
         ! EFTCAMB MOD END.
 
+        if (global_error_flag==0) this%tau0=this%TimeOfz(0._dl)
         if (global_error_flag==0) then
             this%chi0=this%rofChi(this%tau0/this%curvature_radius)
             this%scale= this%chi0*this%curvature_radius/this%tau0  !e.g. change l sampling depending on approx peak spacing
@@ -1789,6 +1790,7 @@
         sqrt(3*(State%grhog+sum(State%grhormass(1:CP%Nu_mass_eigenstates))+State%grhornomass))
     a0=this%tauminn*State%adotrad*(1+om*this%tauminn/4)
     ninverse = nint(background_boost*log(1/a0)/log(1/2d-10)*4000)
+
     if (.not. CP%DarkEnergy%is_cosmological_constant) ninverse = ninverse*2
 
     nlin = ninverse/2
