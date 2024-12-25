@@ -32,6 +32,7 @@
 	02_utilities.o
 
 04p1_parametrizations_1D_allocator.o :  \
+	04p019_mishra_parametrizations_1D.o \
 	04p018_steplog_parametrizations_1D.o \
 	04p013_double_exponential_parametrizations_1D.o \
 	04p008_taylor_expansion_parametrizations_1D.o \
@@ -270,6 +271,12 @@
 	03_abstract_EFTCAMB_cache.o \
 	constants.o
 
+04p019_mishra_parametrizations_1D.o : \
+	04_abstract_parametrizations_1D.o \
+	01_EFT_def.o \
+	03_abstract_EFTCAMB_cache.o \
+	constants.o
+
 05p0_neutral_parametrizations_2D.o :  \
 	03_abstract_EFTCAMB_cache.o \
 	05_abstract_parametrizations_2D.o \
@@ -439,6 +446,7 @@ $(DLL_DIR)/04_abstract_parametrizations_1D.o :  \
 	$(DLL_DIR)/02_utilities.o
 
 $(DLL_DIR)/04p1_parametrizations_1D_allocator.o :  \
+	$(DLL_DIR)/04p019_mishra_parametrizations_1D.o \
 	$(DLL_DIR)/04p018_steplog_parametrizations_1D.o \
 	$(DLL_DIR)/04p013_double_exponential_parametrizations_1D.o \
 	$(DLL_DIR)/04p008_taylor_expansion_parametrizations_1D.o \
@@ -672,6 +680,12 @@ $(DLL_DIR)/04p017_step_parametrizations_1D.o :  \
 	$(DLL_DIR)/constants.o
 
 $(DLL_DIR)/04p018_steplog_parametrizations_1D.o :  \
+	$(DLL_DIR)/04_abstract_parametrizations_1D.o \
+	$(DLL_DIR)/01_EFT_def.o \
+	$(DLL_DIR)/03_abstract_EFTCAMB_cache.o \
+	$(DLL_DIR)/constants.o
+
+$(DLL_DIR)/04p019_mishra_parametrizations_1D.o :  \
 	$(DLL_DIR)/04_abstract_parametrizations_1D.o \
 	$(DLL_DIR)/01_EFT_def.o \
 	$(DLL_DIR)/03_abstract_EFTCAMB_cache.o \
