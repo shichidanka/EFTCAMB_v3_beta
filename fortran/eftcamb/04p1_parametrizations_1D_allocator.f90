@@ -51,6 +51,7 @@ module EFTCAMB_parametrizations_1D
     use EFTCAMB_step_parametrizations_1D
     use EFTCAMB_steplog_parametrizations_1D
     use EFTCAMB_spline_parametrizations_1D
+    use EFTCAMB_mishra_parametrizations_1D
 
     implicit none
 
@@ -97,6 +98,8 @@ contains
                 allocate( steplog_parametrization_1D::in_function )
             case(9)
                 allocate( spline_parametrization_1D::in_function )
+            case(10)
+                allocate( mishra_parametrization_1D::in_function )
             case default
                 write(*,'(a,I3)') 'No model corresponding to flag =', model_flag
                 write(*,'(a,a)')  'For function =', function_name
