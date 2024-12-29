@@ -14,15 +14,15 @@
 !----------------------------------------------------------------------------------------
 
 !> @file 04p019_mishra_parametrizations_1D.f90
-!! This file contains the definition of the Mishra parametrization, around a=0,
-!! up to third order, inheriting from parametrized_function_1D.
+!! This file contains the definition of the Mishra parametrization, in a=[0,1],
+!! up to first order of lambda0, inheriting from parametrized_function_1D.
 
 
 !----------------------------------------------------------------------------------------
-!> This module contains the definition of the Mishra parametrization, around a=0,
-!! up to third order, inheriting from parametrized_function_1D.
+!> This module contains the definition of the Mishra parametrization, in a=[0,1],
+!! up to first order of lambda0, inheriting from parametrized_function_1D.
 
-!> @author Bin Hu, Marco Raveri, Simone Peirone
+!> @author Alvin
 
 module EFTCAMB_mishra_parametrizations_1D
 
